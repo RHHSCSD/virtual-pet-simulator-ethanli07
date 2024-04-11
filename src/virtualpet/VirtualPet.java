@@ -55,6 +55,15 @@ public class VirtualPet {
         int incorrectPasswordCount = 0;
         int userMoney = 0;
         
+        int maxPetHealth = 0;
+        int maxPetHunger = 0;
+        int maxPetEnergy = 0;
+        int maxPetHappiness = 0;
+        int currentPetHealth = 0;
+        int currentPetHunger = 0;
+        int currentPetEnergy = 0;
+        int currentPetHappiness = 0;
+        
         boolean gameExit = false;
         boolean entryAllowed = false;
         boolean namePet = false;
@@ -83,6 +92,7 @@ public class VirtualPet {
         
         //Menu Options
         while (gameExit == false) {
+            
             if (namePet == false) {
                 System.out.println("\n  1. Start     2. Instructions     3. Exit"   );
                 System.out.print("\nWhere would you like to go? ");
@@ -179,11 +189,6 @@ public class VirtualPet {
                 System.out.println("Your pet, named " + petName + ", has been born!");
 
                 //Pet Stats
-                int maxPetHealth = 0;
-                int maxPetHunger = 0;
-                int maxPetEnergy = 0;
-                int maxPetHappiness = 0;
-
                 for (int i = 0; i < MAX_PET_STATS; i = i + 1) {
                     switch (r.nextInt(4)) {
                         case 0:
@@ -202,79 +207,139 @@ public class VirtualPet {
                             break;
                     } 
                 }
+                
                 System.out.println("Max Pet Health: " + maxPetHealth + "\nMax Pet Hunger: " + maxPetHunger + "\nMax Pet Energy: " + maxPetEnergy + "\nMax Pet Happiness: " + maxPetHappiness);
+            
+                currentPetHealth = (maxPetHealth - 2);
+                currentPetHunger = 2;
+                currentPetEnergy = (maxPetEnergy - 2);
+                currentPetHappiness = (maxPetHappiness - 2);
             } //start game if
             else if (playPet == true) { //play with pet
-                System.out.println("1. Number guessing game      2. Matching game");
-                System.out.print("Which game do you want to play: ");
-                int gameSelection = kb.nextInt();
+                System.out.println("1. Play a game      2. Interact with my pet");
+                System.out.print("Do you want to play a game or interact with your pet? ");
+                int userGameMenuChoice = kb.nextInt(); 
                 
-                if (gameSelection == 1) {
-                    int numberToBeGuessed = (r.nextInt(100) + 1);
-                    boolean numberGuessed = false;
-                    int numberOfIncorrectGuesses = 0;
-                    int moneyEarned = 100;
-                
-                    while ((numberGuessed == false) && (numberOfIncorrectGuesses < 5)) {
-                        System.out.println("Guess a number: ");
-                        int userGuess = kb.nextInt();
-                
-                        if (userGuess < numberToBeGuessed) {
-                            System.out.println("Too Low");
-                            moneyEarned /= 2;
-                            numberOfIncorrectGuesses += 1;
+                if (userGameMenuChoice == 1) {
+                    System.out.println("1. Number guessing game      2. Matching game");
+                    System.out.print("Which game do you want to play: ");
+                    int gameSelection = kb.nextInt();
+
+                    if (gameSelection == 1) {
+                        int numberToBeGuessed = (r.nextInt(100) + 1);
+                        boolean numberGuessed = false;
+                        int numberOfIncorrectGuesses = 0;
+                        int moneyEarned = 100;
+
+                        while ((numberGuessed == false) && (numberOfIncorrectGuesses < 5)) {
+                            System.out.println("Guess a number: ");
+                            int userGuess = kb.nextInt();
+
+                            if (userGuess < numberToBeGuessed) {
+                                System.out.println("Too Low");
+                                moneyEarned /= 2;
+                                numberOfIncorrectGuesses += 1;
+                            }
+                            else if (userGuess > numberToBeGuessed) {
+                                System.out.println("Too High");
+                                moneyEarned /= 2;
+                                numberOfIncorrectGuesses += 1;
+                            }
+                            else {
+                                System.out.println("Correct! Congragulations you have earned $" + moneyEarned);
+                                userMoney += moneyEarned;
+                                numberGuessed = true;
+                            }
                         }
-                        else if (userGuess > numberToBeGuessed) {
-                            System.out.println("Too High");
-                            moneyEarned /= 2;
-                            numberOfIncorrectGuesses += 1;
-                        }
-                        else {
-                            System.out.println("Correct! Congragulations you have earned $" + moneyEarned);
-                            userMoney += moneyEarned;
-                            numberGuessed = true;
-                        }
+
+                        System.out.println("You currently have $" + userMoney);
                     }
-                    
-                    System.out.println("You currently have $" + userMoney);
+
+                    else if (gameSelection == 2) {
+                        String stringLetterList = "AABBCCDDEE";
+                        String stringListHidden = "**********";
+                        String stringToBeGuessed = "";
+                        int moneyEarned = 100;
+
+                        while (stringLetterList.equals("") == false) {
+                            int letterIndex = r.nextInt(stringLetterList.length());
+                            stringToBeGuessed += stringLetterList.charAt(letterIndex);
+                            stringLetterList = (stringLetterList.substring(0, letterIndex) + stringLetterList.substring(letterIndex + 1));
+                        }
+
+                        while (stringListHidden.equals(stringToBeGuessed) == false) {
+                            System.out.print("Guess your first index: ");
+                            int firstIndexGuessed = kb.nextInt();
+
+                            System.out.println(stringToBeGuessed);
+
+                            System.out.print("Guess your second index: ");
+                            int secondIndexGuessed = kb.nextInt();
+
+                            if (stringToBeGuessed.charAt(firstIndexGuessed) == stringToBeGuessed.charAt(secondIndexGuessed)) {
+                                stringListHidden = (stringListHidden.substring(0, Math.min(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.min(firstIndexGuessed, secondIndexGuessed) + 1, Math.max(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.max(firstIndexGuessed, secondIndexGuessed) + 1));
+                                System.out.println(stringListHidden);
+                            }
+                            else {
+                                System.out.println("Letter at index " + firstIndexGuessed + " is " + stringToBeGuessed.charAt(firstIndexGuessed));
+                                System.out.println("Letter at index " + secondIndexGuessed + " is " + stringToBeGuessed.charAt(secondIndexGuessed));
+                                moneyEarned /= 2;
+                            } 
+                        }
+
+                        System.out.println("You solved it! Congragulations you have earned " + moneyEarned);
+                        userMoney += moneyEarned;
+
+                        System.out.println("You currently have $" + userMoney);   
+                    }
                 }
                 
-                if (gameSelection == 2) {
-                    String stringLetterList = "AABBCCDDEE";
-                    String stringListHidden = "**********";
-                    String stringToBeGuessed = "";
-                    int moneyEarned = 100;
+                else if (userGameMenuChoice == 2) {
+                    System.out.println("1. Play      2. Feed      3. Groom");
+                    System.out.print("How do you wish to interact with your pet: ");
+                    int userInteractionChoice = kb.nextInt();
                     
-                    while (stringLetterList.equals("") == false) {
-                        int letterIndex = r.nextInt(stringLetterList.length());
-                        stringToBeGuessed += stringLetterList.charAt(letterIndex);
-                        stringLetterList = (stringLetterList.substring(0, letterIndex) + stringLetterList.substring(letterIndex + 1));
-                    }
-                    
-                    while (stringListHidden.equals(stringToBeGuessed) == false) {
-                        System.out.print("Guess your first index: ");
-                        int firstIndexGuessed = kb.nextInt();
-                        
-                        System.out.println(stringToBeGuessed);
-                        
-                        System.out.print("Guess your second index: ");
-                        int secondIndexGuessed = kb.nextInt();
-
-                        if (stringToBeGuessed.charAt(firstIndexGuessed) == stringToBeGuessed.charAt(secondIndexGuessed)) {
-                            stringListHidden = (stringListHidden.substring(0, Math.min(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.min(firstIndexGuessed, secondIndexGuessed) + 1, Math.max(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.max(firstIndexGuessed, secondIndexGuessed) + 1));
-                            System.out.println(stringListHidden);
+                    if (userInteractionChoice == 1) {
+                        if (userMoney < 20) {
+                            System.out.println("Insufficient Money!");
+                        }
+                        else if (currentPetHappiness == maxPetHappiness) {
+                            System.out.println("You are already at max happiness!");
                         }
                         else {
-                            System.out.println("Letter at index " + firstIndexGuessed + " is " + stringToBeGuessed.charAt(firstIndexGuessed));
-                            System.out.println("Letter at index " + secondIndexGuessed + " is " + stringToBeGuessed.charAt(secondIndexGuessed));
-                            moneyEarned /= 2;
-                        } 
+                            userMoney -= 20;
+                            currentPetHappiness += 1;
+                            System.out.println("Your pet's happiness increased to " + currentPetHappiness);
+                        }    
                     }
                     
-                    System.out.println("You solved it! Congragulations you have earned " + moneyEarned);
-                    userMoney += moneyEarned;
+                    if (userInteractionChoice == 2) {
+                        if (userMoney < 20) {
+                            System.out.println("Insufficient Money!");
+                        }
+                        else if (currentPetHunger == 0) {
+                            System.out.println("You are already at minimum hunger!");
+                        }
+                        else {
+                            userMoney -= 20;
+                            currentPetHunger -= 1;
+                            System.out.println("Your pet's hunger decreased to " + currentPetHappiness);
+                        }    
+                    }
                     
-                    System.out.println("You currently have $" + userMoney);   
+                    if (userInteractionChoice == 3) {
+                        if (userMoney < 20) {
+                            System.out.println("Insufficient Money!");
+                        }
+                        else if (currentPetHealth == maxPetHealth) {
+                            System.out.println("You are already at max health!");
+                        }
+                        else {
+                            userMoney -= 20;
+                            currentPetHappiness += 1;
+                            System.out.println("Your pet's health increased to " + currentPetHappiness);
+                        }    
+                    }
                 }
             } // playPet if loop
         } //gameExit while loop
