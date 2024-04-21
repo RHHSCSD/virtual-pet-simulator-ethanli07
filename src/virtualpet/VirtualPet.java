@@ -61,7 +61,7 @@ public class VirtualPet {
                 for (int i = 0; i < currentPetStatsArray.length; i++) {
                     currentPetStatsArray[i] -= 2;
                 }
-            } //start game if
+            } //petCreated if
             else if (playPet == true) { //play with pet
                 System.out.println("1. Play a game      2. Interact with my pet");
                 System.out.print("Do you want to play a game or interact with your pet? ");
@@ -200,11 +200,12 @@ public class VirtualPet {
                 break;
             case "2": 
             case "instructions":
+                playPet = false;
                 break;
             case "3":
             case "exit":
                 System.exit(0);
-                 break;
+                break;
          }
         
         return playPet;
@@ -309,11 +310,14 @@ public class VirtualPet {
             else {
                 System.out.println("Correct! Congragulations you have earned $" + moneyEarned);
                 userMoney += moneyEarned;
+                System.out.println("You currently have $" + userMoney);
                 numberGuessed = true;
             }
         }
-
-        System.out.println("You currently have $" + userMoney);
+        
+        if (numberOfIncorrectGuesses == 5) {
+            System.out.println("Too many incorrect guesses. You lose!");
+        }
         
         return userMoney;
     }
@@ -355,7 +359,6 @@ public class VirtualPet {
 
         System.out.println("You solved it! Congragulations you have earned " + moneyEarned);
         userMoney += moneyEarned;
-
         System.out.println("You currently have $" + userMoney); 
         
         return userMoney;
