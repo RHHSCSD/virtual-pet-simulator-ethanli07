@@ -5,7 +5,8 @@
 
 package virtualpet;
 import java.util.*;
-import java.lang.Math;
+import java.io.*;
+import java.lang.Exception;
 
 /********************************************
 * Program: Virtual Pet Simulator
@@ -23,18 +24,24 @@ public class VirtualPet {
         //Splash Art
         drawStartScreen();
         
-        int userMoney = 0;
         
         //Variables
         boolean gameExit = false;
         boolean petCreated = false;
         boolean playPet = false;
         
+        String username = "";
+        String password = "";
         String petSelected = "";
         String petName = "";
         
         int maxPetStatsArray[] = new int[4];
         int currentPetStatsArray[] = new int[4];
+        
+        int userMoney = 0;
+        
+        boolean userBooleanData[] = {gameExit, petCreated, playPet};
+        String userStringData[] = {username, password, petSelected, petName};
         
         //Login 
         boolean entryAllowed = login();
@@ -44,7 +51,7 @@ public class VirtualPet {
         }
         
         //Menu Options
-        while (gameExit == false) { 
+        while (gameExit == false) {
             if (petCreated == false) {
                 petCreated = petNotCreated(petCreated);
             }
@@ -362,5 +369,22 @@ public class VirtualPet {
         System.out.println("You currently have $" + userMoney); 
         
         return userMoney;
+    }
+    
+    public static void saveUserData(boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoney) throws Exception {
+        File userFile = new File(userStringData[0] + ".txt");
+        PrintWriter output  = new PrintWriter(userFile);
+        
+        for (int i = 0; i < 3; i++) {
+            output.println(userBooleanData[i]);
+        }
+        for (int i = 0; i < 3; i++) {
+            output.println(userStringData[i]);
+        }
+        output.println(Arrays.toString(maxPetStatsArray)); 
+        output.println(Arrays.toString(maxPetStatsArray));
+        output.println(userMoney);
+        
+        output.close();
     }
 }
