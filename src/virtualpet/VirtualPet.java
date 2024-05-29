@@ -34,12 +34,14 @@ public class VirtualPet {
         String petSelected = "";
         String petName = "";
         
-        int maxPetStatsArray[] = new int[4];
-        int currentPetStatsArray[] = new int[4];
+        int maxPetStatsArray[] = new int[3];
+        int currentPetStatsArray[] = new int[3];
+        String petStatsNameArray[] = {"Health", "Hunger", "Energy"};
         
         int userMoney = 0;
+        int petInteractionHistory[] = new int[3];
         
-        boolean userBooleanData[] = {gameExit, petCreated, playPet};
+        boolean userBooleanData[] = {petCreated, playPet};
         String userStringData[] = {username, password, petSelected, petName};
         
         //Login 
@@ -50,13 +52,13 @@ public class VirtualPet {
           System.exit(0);
         }
         
-        //Menu Options
-        while (gameExit == false) {
+        while (true) {
+            //Menu Options
             if (petCreated == false) {
-                petCreated = petNotCreated(petCreated);
+                petCreated = petNotCreated(petCreated, userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
             }
             else { //pet has alreay been created
-                playPet = petIsCreated(playPet);
+                playPet = petIsCreated(playPet, userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney, petInteractionHistory);
             }
 
             //Let's the user select a pet and generates their name and stats
@@ -73,7 +75,7 @@ public class VirtualPet {
                 System.out.println("1. Play a game      2. Interact with my pet");
                 System.out.print("Do you want to play a game or interact with your pet? ");
                 int userGameMenuChoice = kb.nextInt(); 
-                
+
                 if (userGameMenuChoice == 1) { //play a game with the pet
                     System.out.println("1. Number guessing game      2. Matching game");
                     System.out.print("Which game do you want to play: ");
@@ -87,12 +89,12 @@ public class VirtualPet {
                         userMoney = letterUnscrambleGame(userMoney);  
                     }
                 }
-                
+
                 else if (userGameMenuChoice == 2) {//interat with the pet
                     System.out.println("1. Play      2. Feed      3. Groom");
                     System.out.print("How do you wish to interact with your pet: ");
                     int userInteractionChoice = kb.nextInt();
-                    
+
                     if (userMoney < 20) {//checks if they can afford it
                         System.out.println("Insufficient Money!");
                     }
@@ -102,12 +104,12 @@ public class VirtualPet {
                     else {
                         userMoney -= 20;
                         currentPetStatsArray[userInteractionChoice] += 1;
+                        petInteractionHistory[userInteractionChoice] += 1;
+                        System.out.println("Your pet's" + petStatsNameArray[userInteractionChoice] + " stat has been increased!");
                     }
                 }
             } // playPet if loop
-        } //gameExit while loop
-        
-        saveUserData(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
+        }
     }
 
     //Helper Methods
@@ -143,32 +145,48 @@ public class VirtualPet {
         Scanner kb = new Scanner(System.in);
         
         //Variables
-        final String GAME_NAME = "snoopy";
-        final String GAME_PASSWORD = "toto";
-        int incorrectPasswordCount = 0;
+        int incorrectPasswordCount = 0;   
         boolean entryAllowed = false;
         
-        //3 attempts for the user to get their login right
-        while (incorrectPasswordCount < 3 && entryAllowed == false) {
-            System.out.print("Username: ");
-            String userName = kb.nextLine();
+        System.out.print("Username: ");
+        String userName = kb.nextLine();
 
-            System.out.print("Password: ");
-            String userPassword = kb.nextLine();
-            
-            if (userName.equals(GAME_NAME) && userPassword.equals(GAME_PASSWORD)) {
-                entryAllowed = true;
+        System.out.print("Password: ");
+        String userPassword = kb.nextLine();
+        
+        File f = new File(userName + ".txt");
+        
+        if (f.exists() == false) {
+            entryAllowed = true;
+        }
+        else {
+            try {
+                Scanner input = new Scanner(f);
+                input.nextLine();
+                input.nextLine();
+                String correctUsername = input.nextLine();
+                String correctPassword = input.nextLine();
+
+                //3 attempts for the user to get their login right
+                while (incorrectPasswordCount < 3 && entryAllowed == false) {
+                    if (userName.equals(correctUsername) && userPassword.equals(correctPassword)) {
+                        entryAllowed = true;
+                    }
+                    else {
+                        incorrectPasswordCount += 1;
+                        System.out.println("Incorrect!");
+                    }
+                }
             }
-            else {
-                incorrectPasswordCount += 1;
-                System.out.println("Incorrect!");
+            catch (Exception e) {
+                System.out.println("An error has occured.");
             }
         }
         
         return entryAllowed;
     }
     
-    public static boolean petNotCreated(boolean petCreated) {
+    public static boolean petNotCreated(boolean petCreated, boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoney) {
         Scanner kb = new Scanner(System.in);
         
         //Provides menu options
@@ -188,6 +206,8 @@ public class VirtualPet {
                 break;
             case "3":
             case "exit":
+                saveUserData(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
+                System.out.println("Goodbye!");
                 System.exit(0);
                 break;
         }
@@ -195,7 +215,7 @@ public class VirtualPet {
         return petCreated;
     }
     
-    public static boolean petIsCreated(boolean playPet) {
+    public static boolean petIsCreated(boolean playPet, boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoney, int petInteractionHistory[]) {
         Scanner kb = new Scanner(System.in);
         
         //Provides menu options
@@ -217,6 +237,9 @@ public class VirtualPet {
                 break;
             case "3":
             case "exit":
+                summaryOfTheDay(petInteractionHistory);
+                saveUserData(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
+                System.out.println("Goodbye!");
                 System.exit(0);
                 break;
          }
@@ -290,16 +313,16 @@ public class VirtualPet {
         Random r = new Random();
         
         //Variables
-        final int MAX_PET_STATS = 12;
-        int maxPetStatsArray[] = {2, 2, 2, 2}; 
+        final int MAX_PET_STATS = 14;
+        int maxPetStatsArray[] = {2, 2, 2}; 
         
         //Generates the pet's max stats
         for (int i = 0; i < MAX_PET_STATS; i++) {
-            maxPetStatsArray[r.nextInt(4)] += 1;
+            maxPetStatsArray[r.nextInt(3)] += 1;
         } 
         
         //Outputs and returns the pet's max stats
-        System.out.println("Max Pet Health: " + maxPetStatsArray[0] + "\nMax Pet Hunger: " + maxPetStatsArray[1] + "\nMax Pet Energy: " + maxPetStatsArray[2] + "\nMax Pet Happiness: " + maxPetStatsArray[3]);
+        System.out.println("Max Pet Health: " + maxPetStatsArray[0] + "\nMax Pet Hunger: " + maxPetStatsArray[1] + "\nMax Pet Energy: " + maxPetStatsArray[2]);
         return maxPetStatsArray; 
     }
     
@@ -366,20 +389,20 @@ public class VirtualPet {
             System.out.print("Guess your first index: ");
             int firstIndexGuessed = kb.nextInt();
 
-            System.out.println(stringToBeGuessed);
 
             System.out.print("Guess your second index: ");
             int secondIndexGuessed = kb.nextInt();
 
             if (stringToBeGuessed.charAt(firstIndexGuessed) == stringToBeGuessed.charAt(secondIndexGuessed)) {
                 stringListHidden = (stringListHidden.substring(0, Math.min(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.min(firstIndexGuessed, secondIndexGuessed) + 1, Math.max(firstIndexGuessed, secondIndexGuessed)) + stringToBeGuessed.charAt(firstIndexGuessed) + stringListHidden.substring(Math.max(firstIndexGuessed, secondIndexGuessed) + 1));
-                System.out.println(stringListHidden);
             }
             else {
                 System.out.println("Letter at index " + firstIndexGuessed + " is " + stringToBeGuessed.charAt(firstIndexGuessed));
                 System.out.println("Letter at index " + secondIndexGuessed + " is " + stringToBeGuessed.charAt(secondIndexGuessed));
                 moneyEarned /= 2;
             } 
+            
+            System.out.println(stringListHidden);
         }
         
         //Congragulates the user if they won
@@ -390,21 +413,42 @@ public class VirtualPet {
         return userMoney;
     }
     
-    public static void saveUserData(boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoney) throws Exception {
-        File userFile = new File(userStringData[0] + ".txt");
-        PrintWriter output  = new PrintWriter(userFile);
+    public static void saveUserData(boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoney) {
+        try {
+            File userFile = new File(userStringData[0] + ".txt");
+            PrintWriter output  = new PrintWriter(userFile);
         
-        //Iterates through arrays, saving data to a File
-        for (int i = 0; i < 3; i++) {
-            output.println(userBooleanData[i]);
+            //Iterates through arrays, saving data to a File
+            for (int i = 0; i < 2; i++) {
+                output.println(userBooleanData[i]);
+            }
+            for (int i = 0; i < 4; i++) {
+                output.println(userStringData[i]);
+            }
+            output.println(Arrays.toString(maxPetStatsArray)); 
+            output.println(Arrays.toString(currentPetStatsArray));
+            output.println(userMoney);
+
+            output.close();
         }
-        for (int i = 0; i < 3; i++) {
-            output.println(userStringData[i]);
+        catch (Exception e) {
+            System.out.println("An error has occured.");
         }
-        output.println(Arrays.toString(maxPetStatsArray)); 
-        output.println(Arrays.toString(currentPetStatsArray));
-        output.println(userMoney);
-        
-        output.close();
+    }
+    
+    public static void summaryOfTheDay(int petInteractionHistory[]) {
+        System.out.println("\nToday you have: ");
+        System.out.println("Groomed your pet " + petInteractionHistory[0] + " times.");
+        if (petInteractionHistory[0] > 5) {
+            System.out.println("Congragulations you have earned the 'Long Life Ahead' Award!!");
+        }
+        System.out.println("Fed your pet " + petInteractionHistory[1] + " times.");
+        if (petInteractionHistory[0] > 5) {
+            System.out.println("Congragulations you have earned the 'Avid Eater' Award!!");
+        }
+        System.out.println("Played with your pet " + petInteractionHistory[2] + " times.");
+        if (petInteractionHistory[0] > 5) {
+            System.out.println("Congragulations you have earned the 'Full of Energy' Award!!");
+        }
     }
 }
