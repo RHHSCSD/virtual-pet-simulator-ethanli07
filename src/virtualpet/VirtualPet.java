@@ -158,20 +158,18 @@ public class VirtualPet {
         //Ask user for inputs
         System.out.print("Username: ");
         String userName = kb.nextLine();
-
-        System.out.print("Password: ");
-        String userPassword = kb.nextLine();
         
         //Checks if a file exists and either creates an account or makes the user login accordingly
         File f = new File(userName + ".txt");
         
         if (f.exists() == false) {
+            System.out.print("Password: ");
+            String userPassword = kb.nextLine();
             entryAllowed = true;
             userStringData[0] = userName;
             userStringData[1] = userPassword;
         }
         else {
-            System.out.println("File Exists");
             try {
                 Scanner input = new Scanner(f);
                 input.nextLine();
@@ -181,6 +179,9 @@ public class VirtualPet {
 
                 //3 attempts for the user to get their login right
                 while (incorrectPasswordCount < 3 && entryAllowed == false) {
+                    System.out.print("Password: ");
+                    String userPassword = kb.nextLine();
+                    
                     if (userName.equals(correctUsername) && userPassword.equals(correctPassword)) {
                         entryAllowed = true;
                         userStringData[0] = userName;
@@ -194,6 +195,10 @@ public class VirtualPet {
             }
             catch (Exception e) {
                 System.out.println("An error has occured.");
+            }
+            
+            if (incorrectPasswordCount == 3) {
+                System.out.println("Please wait a few minutes before trying to login again.");
             }
         }
         
@@ -221,7 +226,6 @@ public class VirtualPet {
                 break;
             case "3":
             case "exit":
-                System.out.println(userStringData[0] + ".txt");
                 saveUserData(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
                 System.exit(0);
                 break;
@@ -254,7 +258,6 @@ public class VirtualPet {
             case "3":
             case "exit":
                 summaryOfTheDay(petInteractionHistory);
-                System.out.println(userStringData[0] + ".txt");
                 saveUserData(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoney);
                 System.exit(0);
                 break;
