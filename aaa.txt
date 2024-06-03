@@ -1,0 +1,13 @@
+true
+true
+aaa
+bbb
+cat
+yavorola
+8
+5
+7
+6
+3
+5
+3

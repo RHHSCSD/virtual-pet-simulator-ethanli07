@@ -37,16 +37,22 @@ public class VirtualPet {
         String petStatsNameArray[] = {"Health", "Hunger", "Energy"};
         
         String userGameMenuChoice = "";
-        int userMoney = 0;
+        int userMoney = 3;
+        int userMoneyStorage[] = {0};
         int petInteractionHistory[] = new int[3];
         
         boolean userBooleanData[] = {petCreated, playPet};
         String userStringData[] = {username, password, petSelected, petName};
         
         //Login 
-        boolean entryAllowed = login(userStringData);
+        boolean entryAllowed = login(userBooleanData, userStringData, maxPetStatsArray, currentPetStatsArray, userMoneyStorage);
+        petCreated = userBooleanData[0];
+        playPet = userBooleanData[1];
         username = userStringData[0];
         password = userStringData[1];
+        petSelected = userStringData[2];
+        petName = userStringData[3];
+        userMoney = userMoneyStorage[0];
         
         //Prevent user entry if they fail the login
         if (entryAllowed == false) {
@@ -112,7 +118,7 @@ public class VirtualPet {
                         userMoney -= 1;
                         currentPetStatsArray[userInteractionChoice] += 1;
                         petInteractionHistory[userInteractionChoice] += 1;
-                        System.out.println("Your pet's " + petStatsNameArray[userInteractionChoice] + " stat has been increased!");
+                        System.out.println("Your pet's " + petStatsNameArray[userInteractionChoice] + " stat has been increased to " + currentPetStatsArray[userInteractionChoice] + "!");
                     }
                 }
             } // playPet if loop
@@ -148,7 +154,7 @@ public class VirtualPet {
         System.out.println("  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |");
     }
     
-    public static boolean login(String userStringData[]) {
+    public static boolean login(boolean userBooleanData[], String userStringData[], int maxPetStatsArray[], int currentPetStatsArray[], int userMoneyStorage[]) {
         Scanner kb = new Scanner(System.in);
         
         //Variables
@@ -172,11 +178,26 @@ public class VirtualPet {
         else {
             try {
                 Scanner input = new Scanner(f);
+                
+                userBooleanData[0] = input.nextBoolean();
+                userBooleanData[1] = input.nextBoolean();
                 input.nextLine();
-                input.nextLine();
+                
                 String correctUsername = input.nextLine();
                 String correctPassword = input.nextLine();
-
+                userStringData[2] = input.nextLine();
+                userStringData[3] = input.nextLine();
+                
+                maxPetStatsArray[0] = input.nextInt();
+                maxPetStatsArray[1] = input.nextInt();
+                maxPetStatsArray[2] = input.nextInt();
+                
+                currentPetStatsArray[0] = input.nextInt();
+                currentPetStatsArray[1] = input.nextInt();
+                currentPetStatsArray[2] = input.nextInt();
+                
+                userMoneyStorage[0] = input.nextInt();
+                
                 //3 attempts for the user to get their login right
                 while (incorrectPasswordCount < 3 && entryAllowed == false) {
                     System.out.print("Password: ");
@@ -194,7 +215,7 @@ public class VirtualPet {
                 }
             }
             catch (Exception e) {
-                System.out.println("An error has occured.");
+                System.out.println(e);
             }
             
             if (incorrectPasswordCount == 3) {
@@ -445,8 +466,12 @@ public class VirtualPet {
             for (int i = 0; i < 4; i++) {
                 output.println(userStringData[i]);
             }
-            output.println(Arrays.toString(maxPetStatsArray)); 
-            output.println(Arrays.toString(currentPetStatsArray));
+            for (int i = 0; i < 3; i++) {
+                output.println(maxPetStatsArray[i]);
+            }
+            for (int i = 0; i < 3; i++) {
+                output.println(currentPetStatsArray[i]);
+            }
             output.println(userMoney);
             output.close();
         }
